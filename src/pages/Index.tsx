@@ -1,13 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { PatientDashboard } from "@/components/dashboards/PatientDashboard";
+import { AttendantDashboard } from "@/components/dashboards/AttendantDashboard";
+import { ManagerDashboard } from "@/components/dashboards/ManagerDashboard";
 
 const Index = () => {
+  const [user, setUser] = useState<string | null>(null);
+
+  const handleLogin = (userType: string) => {
+    setUser(userType);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  if (!user) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {user === "paciente" && <PatientDashboard onLogout={handleLogout} />}
+      {user === "atendente" && <AttendantDashboard onLogout={handleLogout} />}
+      {user === "gerente" && <ManagerDashboard onLogout={handleLogout} />}
+    </>
   );
 };
 
