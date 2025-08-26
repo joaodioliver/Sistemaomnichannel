@@ -1,25 +1,52 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Calendar, Clock, FileText } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useConversations } from "@/hooks/useConversations";
+import { supabase, Appointment } from "@/lib/supabase";
 
-export const PatientDashboard = ({ onLogout }: { onLogout: () => void }) => {
-  const conversations = [
-    { id: 1, channel: "WhatsApp", lastMessage: "Consulta agendada para amanhã", time: "10:30", status: "respondido" },
-    { id: 2, channel: "Instagram", lastMessage: "Resultado do exame disponível", time: "09:15", status: "novo" },
-  ];
+export const PatientDashboard = () => {
+  const { user, profile, signOut } = useAuth();
+  const { conversations, loading: conversationsLoading } = useConversations(profile?.role, user?.id);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(true);
 
-  const appointments = [
-    { id: 1, doctor: "Dr. Silva", specialty: "Cardiologia", date: "26/08/2025", time: "14:00" },
-    { id: 2, doctor: "Dra. Santos", specialty: "Dermatologia", date: "28/08/2025", time: "10:30" },
-  ];
+  useEffect(() => {
+    if (user?.id) {
+      fetchAppointments();
+    }
+  }, [user?.id]);
+
+  const fetchAppointments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('patient_id', user?.id)
+        .gte('scheduled_date', new Date().toISOString().split('T')[0])
+        .order('scheduled_date', { ascending: true })
+        .limit(5);
+
+      if (error) throw error;
+      setAppointments(data || []);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+    } finally {
+      setLoadingAppointments(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Portal do Paciente</h1>
-          <Button variant="outline" onClick={onLogout}>
+          <div>
+            <h1 className="text-3xl font-bold">Portal do Paciente</h1>
+            <p className="text-muted-foreground">Bem-vindo, {profile?.full_name}</p>
+          </div>
+          <Button variant="outline" onClick={signOut}>
             Sair
           </Button>
         </div>
@@ -34,20 +61,37 @@ export const PatientDashboard = ({ onLogout }: { onLogout: () => void }) => {
               <CardDescription>Suas mensagens com a clínica</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {conversations.map((conv) => (
-                <div key={conv.id} className="flex justify-between items-center p-3 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">{conv.channel}</span>
-                      <Badge variant={conv.status === "novo" ? "default" : "secondary"}>
-                        {conv.status}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{conv.lastMessage}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{conv.time}</span>
+              {conversationsLoading ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
                 </div>
-              ))}
+              ) : conversations.length > 0 ? (
+                conversations.slice(0, 3).map((conv) => (
+                  <div key={conv.id} className="flex justify-between items-center p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium">{conv.channel}</span>
+                        <Badge variant={conv.status === "aberta" ? "default" : "secondary"}>
+                          {conv.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {conv.subject || "Conversa ativa"}
+                      </p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(conv.last_message_at).toLocaleTimeString('pt-BR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground py-4">
+                  Nenhuma conversa ativa
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -60,16 +104,28 @@ export const PatientDashboard = ({ onLogout }: { onLogout: () => void }) => {
               <CardDescription>Seus agendamentos</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {appointments.map((apt) => (
-                <div key={apt.id} className="p-3 border rounded-lg">
-                  <div className="font-medium">{apt.doctor}</div>
-                  <div className="text-sm text-muted-foreground">{apt.specialty}</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">{apt.date} às {apt.time}</span>
-                  </div>
+              {loadingAppointments ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
                 </div>
-              ))}
+              ) : appointments.length > 0 ? (
+                appointments.map((apt) => (
+                  <div key={apt.id} className="p-3 border rounded-lg">
+                    <div className="font-medium">{apt.doctor_name}</div>
+                    <div className="text-sm text-muted-foreground">{apt.specialty}</div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Clock className="h-4 w-4" />
+                      <span className="text-sm">
+                        {new Date(apt.scheduled_date).toLocaleDateString('pt-BR')} às {apt.scheduled_time}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground py-4">
+                  Nenhuma consulta agendada
+                </p>
+              )}
             </CardContent>
           </Card>
 
