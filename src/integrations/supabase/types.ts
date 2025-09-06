@@ -14,7 +14,303 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          created_at: string
+          doctor_name: string
+          duration_minutes: number
+          id: string
+          notes: string | null
+          patient_id: string
+          reminder_sent: boolean
+          scheduled_date: string
+          scheduled_time: string
+          specialty: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_name: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reminder_sent?: boolean
+          scheduled_date: string
+          scheduled_time: string
+          specialty: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_name?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reminder_sent?: boolean
+          scheduled_date?: string
+          scheduled_time?: string
+          specialty?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      attendants: {
+        Row: {
+          created_at: string
+          department: string | null
+          employee_id: string | null
+          id: string
+          is_online: boolean
+          last_activity: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          employee_id?: string | null
+          id?: string
+          is_online?: boolean
+          last_activity?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          employee_id?: string | null
+          id?: string
+          is_online?: boolean
+          last_activity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          attendant_id: string | null
+          channel: string
+          closed_at: string | null
+          created_at: string
+          feedback: string | null
+          id: string
+          last_message_at: string
+          patient_id: string
+          priority: number
+          rating: number | null
+          started_at: string
+          status: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          attendant_id?: string | null
+          channel: string
+          closed_at?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          last_message_at?: string
+          patient_id: string
+          priority?: number
+          rating?: number | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attendant_id?: string | null
+          channel?: string
+          closed_at?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          last_message_at?: string
+          patient_id?: string
+          priority?: number
+          rating?: number | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          file_url: string | null
+          id: string
+          message_type: string
+          read_at: string | null
+          sender_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          message_type?: string
+          read_at?: string | null
+          sender_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          message_type?: string
+          read_at?: string | null
+          sender_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      patients: {
+        Row: {
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          emergency_contact: string | null
+          id: string
+          medical_history: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          emergency_contact?: string | null
+          id?: string
+          medical_history?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          emergency_contact?: string | null
+          id?: string
+          medical_history?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          attendant_id: string
+          avg_response_time_seconds: number
+          conversations_handled: number
+          created_at: string
+          customer_satisfaction_avg: number
+          date: string
+          id: string
+          messages_sent: number
+          updated_at: string
+        }
+        Insert: {
+          attendant_id: string
+          avg_response_time_seconds?: number
+          conversations_handled?: number
+          created_at?: string
+          customer_satisfaction_avg?: number
+          date: string
+          id?: string
+          messages_sent?: number
+          updated_at?: string
+        }
+        Update: {
+          attendant_id?: string
+          avg_response_time_seconds?: number
+          conversations_handled?: number
+          created_at?: string
+          customer_satisfaction_avg?: number
+          date?: string
+          id?: string
+          messages_sent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quick_replies: {
+        Row: {
+          attendant_id: string
+          content: string
+          created_at: string
+          id: string
+          is_global: boolean
+          title: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          attendant_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          title: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          attendant_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          title?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
