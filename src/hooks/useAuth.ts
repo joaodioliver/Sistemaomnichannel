@@ -49,7 +49,7 @@ export const useAuth = () => {
         .maybeSingle()
 
       if (error) throw error
-      setProfile(data)
+      setProfile(data as UserProfile | null)
     } catch (error) {
       console.error('Error fetching profile:', error)
       toast({
@@ -155,7 +155,7 @@ export const useAuth = () => {
 
       if (error) throw error
 
-      setProfile(data)
+      setProfile(data as UserProfile)
       toast({
         title: "Perfil atualizado!",
         description: "Suas informações foram salvas com sucesso",

@@ -62,7 +62,7 @@ export const useMessages = (conversationId?: string) => {
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setMessages(data || [])
+      setMessages((data as any) || [])
     } catch (error: any) {
       console.error('Error fetching messages:', error)
       toast({

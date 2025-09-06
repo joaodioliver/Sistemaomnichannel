@@ -22,14 +22,12 @@ export const ManagerDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch attendants with their profiles
-      const { data: attendantsData } = await supabase
+      const { data: attendantsData, error } = await supabase
         .from('attendants')
-        .select(`
-          *,
-          user_profile:user_profiles(*)
-        `);
+        .select('*');
 
-      setAttendants(attendantsData || []);
+      if (error) throw error
+      setAttendants((attendantsData as any) || [])
 
       // Fetch recent performance metrics
       const { data: metricsData } = await supabase

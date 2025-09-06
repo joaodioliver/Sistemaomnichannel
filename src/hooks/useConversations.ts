@@ -68,7 +68,7 @@ export const useConversations = (userRole?: string, userId?: string) => {
       const { data, error } = await query
 
       if (error) throw error
-      setConversations(data || [])
+      setConversations((data as any) || [])
     } catch (error: any) {
       console.error('Error fetching conversations:', error)
       toast({
