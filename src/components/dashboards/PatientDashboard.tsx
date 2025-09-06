@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Calendar, Clock, FileText } from "lucide-react";
+import { MessageCircle, Calendar, Clock, FileText, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
 import { supabase } from "@/integrations/supabase/client";
 import { Appointment } from "@/types/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 export const PatientDashboard = () => {
   const { user, profile, signOut } = useAuth();
   const { conversations, loading: conversationsLoading } = useConversations(profile?.role, user?.id);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user?.id) {
@@ -39,6 +42,82 @@ export const PatientDashboard = () => {
     }
   };
 
+  const handleNewMessage = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('conversations')
+        .insert({
+          patient_id: user!.id,
+          channel: 'site',
+          subject: 'Nova conversa',
+          status: 'aberta'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      toast({
+        title: "Nova conversa criada!",
+        description: "Você pode começar a conversar agora.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar conversa",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleScheduleAppointment = async () => {
+    try {
+      setLoading(true);
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 7);
+      
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert({
+          patient_id: user!.id,
+          doctor_name: 'Dr. Silva',
+          specialty: 'Clínica Geral',
+          scheduled_date: futureDate.toISOString().split('T')[0],
+          scheduled_time: '09:00:00',
+          status: 'agendado'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      toast({
+        title: "Consulta agendada!",
+        description: "Sua consulta foi agendada com sucesso.",
+      });
+      
+      fetchAppointments();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao agendar consulta",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewResults = () => {
+    toast({
+      title: "Resultados",
+      description: "Funcionalidade em desenvolvimento.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -48,6 +127,7 @@ export const PatientDashboard = () => {
             <p className="text-muted-foreground">Bem-vindo, {profile?.full_name}</p>
           </div>
           <Button variant="outline" onClick={signOut}>
+            <LogOut className="mr-2 h-4 w-4" />
             Sair
           </Button>
         </div>
@@ -139,13 +219,30 @@ export const PatientDashboard = () => {
               <CardDescription>O que você gostaria de fazer?</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline" 
+                onClick={handleNewMessage}
+                disabled={loading}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
                 Nova Mensagem
               </Button>
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={handleScheduleAppointment}
+                disabled={loading}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
                 Agendar Consulta
               </Button>
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={handleViewResults}
+              >
+                <FileText className="mr-2 h-4 w-4" />
                 Ver Resultados
               </Button>
             </CardContent>
