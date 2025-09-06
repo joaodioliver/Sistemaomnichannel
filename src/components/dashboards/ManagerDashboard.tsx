@@ -6,7 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Users, MessageCircle, Clock, TrendingUp, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase, Attendant, PerformanceMetric } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import { Attendant, PerformanceMetric } from "@/types/supabase";
 
 export const ManagerDashboard = () => {
   const { signOut, profile } = useAuth();

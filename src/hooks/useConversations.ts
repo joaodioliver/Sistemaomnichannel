@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { supabase, Conversation, Message } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { Conversation, Message } from '@/types/supabase'
 
 export const useConversations = (userRole?: string, userId?: string) => {
   const [conversations, setConversations] = useState<Conversation[]>([])

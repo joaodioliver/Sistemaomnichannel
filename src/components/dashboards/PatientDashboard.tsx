@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Calendar, Clock, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
-import { supabase, Appointment } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import { Appointment } from "@/types/supabase";
 
 export const PatientDashboard = () => {
   const { user, profile, signOut } = useAuth();

@@ -7,7 +7,8 @@ import { MessageCircle, Clock, User, Send } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
-import { supabase, QuickReply } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import { QuickReply } from "@/types/supabase";
 
 export const AttendantDashboard = () => {
   const { user, profile, signOut } = useAuth();
