@@ -49,7 +49,25 @@ export const useAuth = () => {
         .maybeSingle()
 
       if (error) throw error
-      setProfile(data as UserProfile | null)
+      
+      if (!data) {
+        // Se não existe perfil, cria um novo
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: userId,
+            role: 'paciente',
+            full_name: user?.user_metadata?.full_name || user?.email || '',
+            is_active: true
+          })
+          .select()
+          .single()
+
+        if (createError) throw createError
+        setProfile(newProfile as UserProfile)
+      } else {
+        setProfile(data as UserProfile)
+      }
     } catch (error) {
       console.error('Error fetching profile:', error)
       toast({
