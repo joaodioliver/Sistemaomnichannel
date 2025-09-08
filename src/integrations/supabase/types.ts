@@ -65,6 +65,13 @@ export type Database = {
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_appointments_patient_id"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       attendants: {
@@ -155,7 +162,68 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_conversations_attendant_id"
+            columns: ["attendant_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_conversations_patient"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_conversations_patient_id"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_results: {
+        Row: {
+          created_at: string
+          doctor_name: string | null
+          exam_date: string
+          exam_type: string
+          file_url: string | null
+          id: string
+          patient_id: string
+          result_summary: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_name?: string | null
+          exam_date: string
+          exam_type: string
+          file_url?: string | null
+          id?: string
+          patient_id: string
+          result_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_name?: string | null
+          exam_date?: string
+          exam_type?: string
+          file_url?: string | null
+          id?: string
+          patient_id?: string
+          result_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_medical_results_patient_id"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
@@ -209,7 +277,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_messages_conversation_id"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_messages_sender"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_messages_sender_id"
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"

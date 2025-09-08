@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Calendar, Clock, FileText, LogOut } from "lucide-react";
+import { MessageCircle, Calendar, Clock, FileText, LogOut, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
 import { supabase } from "@/integrations/supabase/client";
 import { Appointment } from "@/types/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { ChatDialog } from "@/components/chat/ChatDialog";
+import { MedicalResultsDialog } from "@/components/medical/MedicalResultsDialog";
 
 export const PatientDashboard = () => {
   const { user, profile, signOut } = useAuth();
@@ -15,6 +17,8 @@ export const PatientDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loadingAppointments, setLoadingAppointments] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [resultsOpen, setResultsOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,35 +46,8 @@ export const PatientDashboard = () => {
     }
   };
 
-  const handleNewMessage = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('conversations')
-        .insert({
-          patient_id: user!.id,
-          channel: 'site',
-          subject: 'Nova conversa',
-          status: 'aberta'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      toast({
-        title: "Nova conversa criada!",
-        description: "Você pode começar a conversar agora.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro ao criar conversa",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleNewMessage = () => {
+    setChatOpen(true);
   };
 
   const handleScheduleAppointment = async () => {
@@ -112,10 +89,34 @@ export const PatientDashboard = () => {
   };
 
   const handleViewResults = () => {
-    toast({
-      title: "Resultados",
-      description: "Funcionalidade em desenvolvimento.",
-    });
+    setResultsOpen(true);
+  };
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelado' })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Consulta cancelada",
+        description: "Sua consulta foi cancelada com sucesso.",
+      });
+      
+      fetchAppointments();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cancelar consulta",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -192,13 +193,32 @@ export const PatientDashboard = () => {
               ) : appointments.length > 0 ? (
                 appointments.map((apt) => (
                   <div key={apt.id} className="p-3 border rounded-lg">
-                    <div className="font-medium">{apt.doctor_name}</div>
-                    <div className="text-sm text-muted-foreground">{apt.specialty}</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Clock className="h-4 w-4" />
-                      <span className="text-sm">
-                        {new Date(apt.scheduled_date).toLocaleDateString('pt-BR')} às {apt.scheduled_time}
-                      </span>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <div className="font-medium">{apt.doctor_name}</div>
+                        <div className="text-sm text-muted-foreground">{apt.specialty}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-sm">
+                            {new Date(apt.scheduled_date).toLocaleDateString('pt-BR')} às {apt.scheduled_time}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={apt.status === 'agendado' ? 'default' : 'secondary'}>
+                          {apt.status}
+                        </Badge>
+                        {apt.status === 'agendado' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCancelAppointment(apt.id)}
+                            disabled={loading}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -249,6 +269,16 @@ export const PatientDashboard = () => {
           </Card>
         </div>
       </div>
+
+      <ChatDialog
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+      />
+
+      <MedicalResultsDialog
+        open={resultsOpen}
+        onOpenChange={setResultsOpen}
+      />
     </div>
   );
 };
