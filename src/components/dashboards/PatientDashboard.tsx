@@ -33,6 +33,7 @@ export const PatientDashboard = () => {
         .from('appointments')
         .select('*')
         .eq('patient_id', user?.id)
+        .neq('status', 'cancelado')
         .gte('scheduled_date', new Date().toISOString().split('T')[0])
         .order('scheduled_date', { ascending: true })
         .limit(5);
