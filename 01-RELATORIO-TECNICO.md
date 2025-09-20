@@ -313,7 +313,7 @@ O sistema omnichannel desenvolvido atende plenamente aos requisitos estabelecido
 
 ---
 
-**Documento elaborado em:** Janeiro 2025  
+**Documento elaborado em:** Setembro 2025  
 **Versão:** 1.0  
 **Responsável Técnico:** João Victor Batista  
 **Status:** Implementado e em produção
