@@ -311,15 +311,9 @@ O sistema omnichannel desenvolvido atende plenamente aos requisitos estabelecido
 - **Otimização** de processos operacionais
 - **Visibilidade** através de métricas e relatórios
 
-### 12.2 Métricas de Sucesso
-- **Redução** de 40% no tempo de resposta
-- **Aumento** de 60% na satisfação do cliente
-- **Melhoria** de 50% na produtividade dos atendentes
-- **Centralização** de 100% dos canais de comunicação
-
 ---
 
 **Documento elaborado em:** Janeiro 2025  
 **Versão:** 1.0  
-**Responsável Técnico:** Sistema Lovable  
+**Responsável Técnico:** João Victor Batista  
 **Status:** Implementado e em produção
