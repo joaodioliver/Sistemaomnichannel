@@ -190,6 +190,62 @@ export const useAuth = () => {
     }
   }
 
+  const resetPassword = async (email: string) => {
+    try {
+      setLoading(true)
+      const redirectUrl = `${window.location.origin}/reset-password`
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Email enviado!",
+        description: "Verifique sua caixa de entrada para redefinir sua senha",
+      })
+
+      return { error: null }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message,
+        variant: "destructive",
+      })
+      return { error }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updatePassword = async (newPassword: string) => {
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Senha atualizada!",
+        description: "Sua senha foi alterada com sucesso",
+      })
+
+      return { error: null }
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar senha",
+        description: error.message,
+        variant: "destructive",
+      })
+      return { error }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     user,
     profile,
@@ -199,5 +255,7 @@ export const useAuth = () => {
     signUp,
     signOut,
     updateProfile,
+    resetPassword,
+    updatePassword,
   }
 }
