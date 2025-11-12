@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
+import { Heart } from "lucide-react";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -34,9 +35,19 @@ export const LoginForm = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Sistema Omnichannel</CardTitle>
-          <CardDescription>Clínica Médica - Acesse sua conta</CardDescription>
+        <CardHeader className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="relative">
+              <Heart className="h-12 w-12 text-primary fill-primary" />
+              <div className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              La Vida
+            </CardTitle>
+            <CardDescription className="text-base">Clínica Médica - Acesse sua conta</CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           {!showForgotPassword ? (
