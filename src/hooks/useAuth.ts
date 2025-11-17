@@ -12,27 +12,30 @@ export const useAuth = () => {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for auth changes FIRST (prevents missing events)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        // Defer any Supabase calls to avoid deadlocks and ensure JWT is attached
+        setTimeout(() => {
+          fetchProfile(session.user!.id)
+        }, 0)
       } else {
+        setProfile(null)
         setLoading(false)
       }
     })
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Then check existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        setTimeout(() => {
+          fetchProfile(session.user!.id)
+        }, 0)
       } else {
-        setProfile(null)
         setLoading(false)
       }
     })
@@ -42,6 +45,11 @@ export const useAuth = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      // Ensure we have an authenticated session matching the userId
+      if (!session?.user || session.user.id !== userId) {
+        return
+      }
+
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -49,31 +57,30 @@ export const useAuth = () => {
         .maybeSingle()
 
       if (error) throw error
-      
+
       if (!data) {
-        // Se não existe perfil, cria um novo
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
           .insert({
             id: userId,
             role: 'paciente',
             full_name: user?.user_metadata?.full_name || user?.email || '',
-            is_active: true
+            is_active: true,
           })
           .select()
-          .single()
+          .maybeSingle()
 
         if (createError) throw createError
-        setProfile(newProfile as UserProfile)
+        if (newProfile) setProfile(newProfile as UserProfile)
       } else {
         setProfile(data as UserProfile)
       }
     } catch (error) {
       console.error('Error fetching profile:', error)
       toast({
-        title: "Erro ao carregar perfil",
-        description: "Não foi possível carregar seus dados",
-        variant: "destructive",
+        title: 'Erro ao carregar perfil',
+        description: 'Não foi possível carregar seus dados',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -92,7 +99,7 @@ export const useAuth = () => {
 
       toast({
         title: "Login realizado com sucesso!",
-        description: "Bem-vindo ao sistema omnichannel",
+        description: "Bem-vindo ao La Vida",
       })
 
       return { user: data.user, error: null }
