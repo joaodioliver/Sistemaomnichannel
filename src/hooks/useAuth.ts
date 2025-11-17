@@ -17,10 +17,11 @@ export const useAuth = () => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
+        setLoading(true)
         // Defer any Supabase calls to avoid deadlocks and ensure JWT is attached
         setTimeout(() => {
           fetchProfile(session.user!.id)
-        }, 0)
+        }, 100)
       } else {
         setProfile(null)
         setLoading(false)
@@ -32,9 +33,10 @@ export const useAuth = () => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
+        setLoading(true)
         setTimeout(() => {
           fetchProfile(session.user!.id)
-        }, 0)
+        }, 100)
       } else {
         setLoading(false)
       }
@@ -45,11 +47,6 @@ export const useAuth = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      // Ensure we have an authenticated session matching the userId
-      if (!session?.user || session.user.id !== userId) {
-        return
-      }
-
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -58,22 +55,16 @@ export const useAuth = () => {
 
       if (error) throw error
 
-      if (!data) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: userId,
-            role: 'paciente',
-            full_name: user?.user_metadata?.full_name || user?.email || '',
-            is_active: true,
-          })
-          .select()
-          .maybeSingle()
-
-        if (createError) throw createError
-        if (newProfile) setProfile(newProfile as UserProfile)
-      } else {
+      if (data) {
         setProfile(data as UserProfile)
+      } else {
+        // Profile doesn't exist - show error
+        console.error('Profile not found for user:', userId)
+        toast({
+          title: 'Perfil não encontrado',
+          description: 'Entre em contato com o suporte',
+          variant: 'destructive',
+        })
       }
     } catch (error) {
       console.error('Error fetching profile:', error)
