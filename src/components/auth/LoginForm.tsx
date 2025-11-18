@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Heart } from "lucide-react";
 
@@ -11,6 +12,7 @@ export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"paciente" | "atendente" | "gerente">("paciente");
   const [resetEmail, setResetEmail] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { signIn, signUp, resetPassword, loading } = useAuth();
@@ -22,7 +24,7 @@ export const LoginForm = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signUp(email, password, fullName);
+    await signUp(email, password, fullName, role);
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -135,6 +137,20 @@ export const LoginForm = () => {
                     required
                     minLength={6}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-role">Tipo de Conta</Label>
+                  <Select value={role} onValueChange={(value: "paciente" | "atendente" | "gerente") => setRole(value)}>
+                    <SelectTrigger id="signup-role">
+                      <SelectValue placeholder="Selecione o tipo de conta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paciente">Paciente</SelectItem>
+                      <SelectItem value="atendente">Atendente</SelectItem>
+                      <SelectItem value="gerente">Gerente</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
