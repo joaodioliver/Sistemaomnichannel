@@ -8,6 +8,8 @@ import { Users, MessageCircle, Clock, TrendingUp, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Attendant, PerformanceMetric } from "@/types/supabase";
+import { UserManagementPanel } from "@/components/management/UserManagementPanel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const ManagerDashboard = () => {
   const { signOut, profile } = useAuth();
@@ -81,6 +83,14 @@ export const ManagerDashboard = () => {
             Sair
           </Button>
         </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="users">Usuários</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
 
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -246,6 +256,12 @@ export const ManagerDashboard = () => {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserManagementPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
