@@ -9,6 +9,8 @@ import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
 import { supabase } from "@/integrations/supabase/client";
 import { QuickReply } from "@/types/supabase";
+import { IntegrationsPanel } from "@/components/integrations/IntegrationsPanel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const AttendantDashboard = () => {
   const { user, profile, signOut } = useAuth();
@@ -57,7 +59,14 @@ export const AttendantDashboard = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-12 gap-6 h-[calc(100vh-140px)]">
+        <Tabs defaultValue="conversations" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="conversations">Conversas</TabsTrigger>
+            <TabsTrigger value="integrations">Integrações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="conversations">
+            <div className="grid grid-cols-12 gap-6 h-[calc(100vh-200px)]">
           {/* Lista de Conversas */}
           <Card className="col-span-4">
             <CardHeader>
@@ -212,7 +221,13 @@ export const AttendantDashboard = () => {
               )}
             </CardContent>
           </Card>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="integrations">
+            <IntegrationsPanel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

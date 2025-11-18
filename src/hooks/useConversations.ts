@@ -100,6 +100,23 @@ export const useConversations = (userRole?: string, userId?: string) => {
 
       if (error) throw error
 
+      // Enviar mensagem automática de boas-vindas do bot
+      const botMessage = `Olá! 👋 Bem-vindo ao nosso sistema de atendimento.\n\nSou um assistente virtual e já registrei sua solicitação. Um de nossos atendentes irá responder em breve.\n\nEnquanto aguarda, sinta-se à vontade para descrever sua necessidade com mais detalhes.`;
+      
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: data.id,
+          sender_id: patientId, // Bot usa o ID do sistema
+          content: botMessage,
+          message_type: 'text',
+          status: 'entregue'
+        })
+
+      if (messageError) {
+        console.error('Error sending bot message:', messageError)
+      }
+
       toast({
         title: "Conversa iniciada!",
         description: "Nova conversa criada com sucesso",
